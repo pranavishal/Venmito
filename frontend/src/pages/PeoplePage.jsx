@@ -78,11 +78,17 @@ export default function PeoplePage() {
       // Log the response data
       console.log("Response from server:", response.data);
       setResults(response.data);
+      setCurrentPage(1); // Reset to page 1 whenever new results are fetched
     } catch (error) {
       console.error("Full error object:", error);
       console.error("Error response if any:", error.response);
     }
   };
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">People Page</h1>

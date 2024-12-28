@@ -50,6 +50,7 @@ export default function PromotionsPage() {
         }
       );
       setResults(response.data);
+      setCurrentPage(1); // Reset to page 1 whenever new results are fetched
     } catch (error) {
       console.error("Error fetching data:", error);
     }
