@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import create_engine, or_, and_
+from sqlalchemy import create_engine, or_, and_, func, case
 from sqlalchemy.orm import sessionmaker
 from models.people import People
 import os
@@ -78,5 +78,64 @@ def filter_people():
         ]
 
         return jsonify(people), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@people_blueprint.route('/stats', methods=['GET'])
+def get_stats():
+    try:
+        # Get total count for percentages
+        total_people = session.query(People).count()
+
+        # Get country stats
+        country_stats = session.query(
+            People.country,
+            func.count(People.id).label('count')
+        ).group_by(People.country).all()
+
+        # Get device stats
+        total_devices = session.query(
+            func.sum(
+                case((People.Android.is_(True), 1), else_=0) +
+                case((People.iPhone.is_(True), 1), else_=0) +
+                case((People.Desktop.is_(True), 1), else_=0)
+            )
+        ).scalar() or 0
+
+        android_count = session.query(func.count(People.id)).filter(People.Android.is_(True)).scalar()
+        iphone_count = session.query(func.count(People.id)).filter(People.iPhone.is_(True)).scalar()
+        desktop_count = session.query(func.count(People.id)).filter(People.Desktop.is_(True)).scalar()
+
+        stats = {
+            'country_stats': [
+                {
+                    'country': stat.country or 'Unknown',
+                    'count': stat.count,
+                    'percentage': round((stat.count / total_people) * 100, 2)
+                }
+                for stat in country_stats
+            ],
+            'device_stats': [
+                {
+                    'device': 'Android',
+                    'count': android_count,
+                    'percentage': round((android_count / total_devices) * 100, 2) if total_devices > 0 else 0
+                },
+                {
+                    'device': 'iPhone',
+                    'count': iphone_count,
+                    'percentage': round((iphone_count / total_devices) * 100, 2) if total_devices > 0 else 0
+                },
+                {
+                    'device': 'Desktop',
+                    'count': desktop_count,
+                    'percentage': round((desktop_count / total_devices) * 100, 2) if total_devices > 0 else 0
+                }
+            ],
+            'total_people': total_people,
+            'total_devices': total_devices
+        }
+
+        return jsonify(stats), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

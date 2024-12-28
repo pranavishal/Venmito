@@ -76,3 +76,12 @@ if __name__ == "__main__":
 
     # Save the cleaned transactions
     save_cleaned_transactions(transactions_df)
+
+    # Group by customer_id and count unique stores
+    store_counts = transactions_df.groupby('customer_id')['store'].nunique().sort_values(ascending=False)
+
+    # Get the customer_id with most stores (this will be the first one since we sorted descending)
+    customer_with_most_stores = store_counts.head(1)
+
+    print(f"Customer ID: {customer_with_most_stores.index[0]}")
+    print(f"Number of unique stores: {customer_with_most_stores.values[0]}")

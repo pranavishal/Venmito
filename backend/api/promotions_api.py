@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import create_engine, or_, and_
+from sqlalchemy import create_engine, or_, and_, func, case
 from sqlalchemy.orm import sessionmaker
 from models.promotions import Promotions
+from models.people import People
 import os
 
 # Set up SQLAlchemy
@@ -61,3 +62,64 @@ def filter_promotions():
         return jsonify(promotions), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@promotions_blueprint.route('/stats', methods=['GET'])
+def get_promotion_stats():
+    try:
+        # Get response rate by country
+        country_response_rates = session.query(
+            People.country,
+            func.count(Promotions.id).label('total_promotions'),
+            func.sum(
+                case(
+                    (Promotions.responded == 'Yes', 1),
+                    else_=0
+                )
+            ).label('accepted_promotions')
+        ).join(
+            Promotions,
+            People.email == Promotions.client_email
+        ).group_by(
+            People.country
+        ).all()
+
+        # Calculate percentages and format response
+        country_stats = []
+        for country, total, accepted in country_response_rates:
+            if total > 0:  # Avoid division by zero
+                response_rate = (accepted / total) * 100
+                country_stats.append({
+                    'country': country or 'Unknown',
+                    'total_promotions': total,
+                    'accepted_promotions': accepted,
+                    'response_rate': round(response_rate, 2)
+                })
+
+        # Overall promotion statistics
+        overall_stats = session.query(
+            func.count(Promotions.id).label('total_promotions'),
+            func.sum(
+                case(
+                    (Promotions.responded == 'Yes', 1),
+                    else_=0
+                )
+            ).label('total_accepted'),
+            func.count(func.distinct(Promotions.promotion)).label('unique_promotions')
+        ).first()
+
+        return jsonify({
+            'country_stats': country_stats,
+            'overall_stats': {
+                'total_promotions': overall_stats[0],
+                'total_accepted': overall_stats[1],
+                'unique_promotions': overall_stats[2],
+                'overall_response_rate': round(
+                    (overall_stats[1] / overall_stats[0] * 100), 2
+                ) if overall_stats[0] > 0 else 0
+            }
+        }), 200
+
+    except Exception as e:
+        print(f"Error in get_promotion_stats: {str(e)}")  # For debugging
+        return jsonify({"error": str(e)}), 500
+

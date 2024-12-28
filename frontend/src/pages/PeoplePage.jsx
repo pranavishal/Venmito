@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "../components/Table";
+import PieChart from "../components/PieChart";
 
 export default function PeoplePage() {
   const [filters, setFilters] = useState({
@@ -88,6 +89,31 @@ export default function PeoplePage() {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    fetchResults();
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:5000/api/people/stats"
+      );
+      setStats(response.data);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
+  // Device chart custom colors
+  const deviceColors = [
+    "rgba(255, 99, 132, 0.8)", // Red for Android
+    "rgba(54, 162, 235, 0.8)", // Blue for iPhone
+    "rgba(75, 192, 192, 0.8)", // Green for Desktop
+  ];
 
   return (
     <div className="p-4">
@@ -195,6 +221,21 @@ export default function PeoplePage() {
         {Math.min(indexOfLastResult, results.length)} of {results.length}{" "}
         results
       </div>
+      {stats && (
+        <div className="flex justify-center items-center gap-8">
+          <PieChart
+            title="People by Country"
+            data={stats.country_stats.map((stat) => stat.percentage)}
+            labels={stats.country_stats.map((stat) => stat.country)}
+          />
+          <PieChart
+            title="People by Device"
+            data={stats.device_stats.map((stat) => stat.percentage)}
+            labels={stats.device_stats.map((stat) => stat.device)}
+            customColors={deviceColors}
+          />
+        </div>
+      )}
     </div>
   );
 }

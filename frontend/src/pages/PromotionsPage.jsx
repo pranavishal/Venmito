@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "../components/Table";
+import BarChart from "../components/BarChart";
 
 export default function PromotionsPage() {
   const [filters, setFilters] = useState({
@@ -59,6 +60,23 @@ export default function PromotionsPage() {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const [countryStats, setCountryStats] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:5000/api/promotions/stats"
+        );
+        setCountryStats(response.data.country_stats);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="p-4">
@@ -140,6 +158,12 @@ export default function PromotionsPage() {
         {Math.min(indexOfLastResult, results.length)} of {results.length}{" "}
         results
       </div>
+
+      <BarChart
+        title="Response Rate by Country"
+        data={countryStats.map((stat) => stat.response_rate)}
+        labels={countryStats.map((stat) => stat.country)}
+      />
     </div>
   );
 }
