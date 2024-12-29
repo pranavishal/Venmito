@@ -11,7 +11,6 @@ from api.people_api import people_blueprint
 from api.promotions_api import promotions_blueprint
 from api.transactions_api import transactions_blueprint
 from api.transfers_api import transfers_blueprint
-from api.chatbot_api import chatbot_blueprint
 from api.initialize_api import initialize_blueprint
 
 # Create Flask app
@@ -88,7 +87,6 @@ app.register_blueprint(people_blueprint, url_prefix="/api/people")
 app.register_blueprint(promotions_blueprint, url_prefix="/api/promotions")
 app.register_blueprint(transactions_blueprint, url_prefix="/api/transactions")
 app.register_blueprint(transfers_blueprint, url_prefix="/api/transfers")
-app.register_blueprint(chatbot_blueprint, url_prefix="/api/chatbot")
 app.register_blueprint(initialize_blueprint, url_prefix="/api/initialize")
 
 # Route to get stored insights
