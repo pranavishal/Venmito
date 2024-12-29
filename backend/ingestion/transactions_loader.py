@@ -50,14 +50,14 @@ def save_cleaned_transactions(transactions_df):
     """
     Saves the cleaned transactions to a CSV file.
     """
-    output_path = Path("../datasets/processed/transactions_cleaned.csv")
+    output_path = Path("datasets/processed/transactions_cleaned.csv")
     transactions_df.to_csv(output_path, index=False)
     print(f"\nCleaned transactions data saved to: {output_path}")
 
 if __name__ == "__main__":
     # File paths
-    transactions_path = Path("../datasets/raw/transactions.xml")
-    people_path = Path("../datasets/processed/people_merged.csv")
+    transactions_path = Path("datasets/raw/transactions.xml")
+    people_path = Path("datasets/processed/people_merged.csv")
 
     # Load the data
     print("Loading transactions...")

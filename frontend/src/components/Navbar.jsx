@@ -16,7 +16,6 @@ export default function Navbar() {
     { path: "/transactions", label: "Transactions" },
     { path: "/transfers", label: "Transfers" },
     { path: "/insights", label: "Insights" },
-    { path: "/chatbot", label: "Chatbot" },
   ];
 
   return (

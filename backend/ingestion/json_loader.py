@@ -32,7 +32,7 @@ def normalize_devices(df):
     return df
 
 if __name__ == "__main__":
-    filepath = Path("../datasets/raw/people.json")
+    filepath = Path("datasets/raw/people.json")
     data = load_json_file(filepath)
     people_df = json_to_dataframe(data)
     check_missing_values(people_df)
@@ -41,5 +41,5 @@ if __name__ == "__main__":
     # Print the updated DataFrame to verify the changes
     print("\nFinal Normalized Dataframe:")
     print(people_df.head())
-    output_path = Path("../datasets/processed/people_cleaned_json.csv")
+    output_path = Path("datasets/processed/people_cleaned_json.csv")
     people_df.to_csv(output_path, index=False)

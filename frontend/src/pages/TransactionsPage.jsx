@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "../components/Table";
+import StatTable from "../components/StatTable";
+import PieChart from "../components/PieChart";
 
 export default function TransactionsPage() {
   const [filters, setFilters] = useState({
@@ -47,6 +49,35 @@ export default function TransactionsPage() {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const [customerStats, setCustomerStats] = useState([]);
+  const [storeStats, setStoreStats] = useState([]);
+  const [spendingByCountry, setSpendingByCountry] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const customerResponse = await axios.get(
+          "http://127.0.0.1:5000/api/transactions/stats/customers"
+        );
+        setCustomerStats(customerResponse.data);
+
+        const storeResponse = await axios.get(
+          "http://127.0.0.1:5000/api/transactions/stats/stores"
+        );
+        setStoreStats(storeResponse.data);
+
+        const countryResponse = await axios.get(
+          "http://127.0.0.1:5000/api/transactions/stats/spending_by_country"
+        );
+        setSpendingByCountry(countryResponse.data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="p-4">
@@ -121,6 +152,35 @@ export default function TransactionsPage() {
         Showing {indexOfFirstResult + 1} to{" "}
         {Math.min(indexOfLastResult, results.length)} of {results.length}{" "}
         results
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+        <div className="flex-1 flex justify-center">
+          <div>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Customer Spending (Greatest to Least)
+            </h2>
+            <StatTable data={customerStats} />
+          </div>
+        </div>
+        <div className="flex-1 flex justify-center">
+          <div>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Store Revenue (Greatest to Least)
+            </h2>
+            <StatTable data={storeStats} />
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center mt-8">
+        <div>
+          <h2 className="text-xl font-bold mb-4 text-center"></h2>
+          <PieChart
+            title="Transactions Spent by Country"
+            data={spendingByCountry.map((stat) => stat.total_spent)}
+            labels={spendingByCountry.map((stat) => stat.country)}
+          />
+        </div>
       </div>
     </div>
   );

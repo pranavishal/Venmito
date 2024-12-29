@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_, and_, func, case
 from sqlalchemy.orm import sessionmaker
 from models.transfers import Transfers
+from models.people import People
 from datetime import datetime
 import os
 
@@ -73,4 +74,58 @@ def filter_transfers():
 
         return jsonify(transfers), 200
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@transfers_blueprint.route('/stats/country_transfers', methods=['GET'])
+def get_country_transfer_stats():
+    try:
+        # Total money sent by each country
+        sent_stats = session.query(
+            People.country.label('country'),
+            func.sum(Transfers.amount).label('total_sent')
+        ).join(
+            Transfers, People.id == Transfers.sender_id
+        ).group_by(
+            People.country
+        ).all()
+
+        # Total money received by each country
+        received_stats = session.query(
+            People.country.label('country'),
+            func.sum(Transfers.amount).label('total_received')
+        ).join(
+            Transfers, People.id == Transfers.recipient_id
+        ).group_by(
+            People.country
+        ).all()
+
+        # Format results
+        sent_results = [{'country': stat[0], 'total_sent': float(stat[1])} for stat in sent_stats]
+        received_results = [{'country': stat[0], 'total_received': float(stat[1])} for stat in received_stats]
+
+        return jsonify({
+            'sent': sent_results,
+            'received': received_results
+        }), 200
+
+    except Exception as e:
+        print(f"Error in get_country_transfer_stats: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@transfers_blueprint.route('/stats/monthly_totals', methods=['GET'])
+def get_monthly_totals():
+    try:
+        # Query to calculate total money sent per month
+        monthly_totals = session.query(
+            func.strftime('%Y-%m', Transfers.date).label('month'),
+            func.sum(Transfers.amount).label('total_sent')
+        ).group_by('month').order_by('month').all()
+
+        # Format results
+        results = [{'month': row[0], 'total_sent': float(row[1])} for row in monthly_totals]
+
+        return jsonify(results), 200
+
+    except Exception as e:
+        print(f"Error in get_monthly_totals: {str(e)}")
         return jsonify({"error": str(e)}), 500

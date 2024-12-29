@@ -3,8 +3,8 @@ from pathlib import Path
 
 def load_people_files():
 
-    json_path = Path("../datasets/processed/people_cleaned_json.csv")
-    yml_path = Path("../datasets/processed/people_cleaned_yml.csv")
+    json_path = Path("datasets/processed/people_cleaned_json.csv")
+    yml_path = Path("datasets/processed/people_cleaned_yml.csv")
 
     json_df = pd.read_csv(json_path)
     yml_df = pd.read_csv(yml_path)
@@ -50,7 +50,7 @@ def merge_people_data(json_df, yml_df):
     return merged_df
 
 def save_merged_people(merged_df):
-    output_path = Path("../datasets/processed/people_merged.csv")
+    output_path = Path("datasets/processed/people_merged.csv")
     merged_df.to_csv(output_path, index=False)
 
 if __name__ == "__main__":

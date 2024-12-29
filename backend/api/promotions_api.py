@@ -123,3 +123,33 @@ def get_promotion_stats():
         print(f"Error in get_promotion_stats: {str(e)}")  # For debugging
         return jsonify({"error": str(e)}), 500
 
+@promotions_blueprint.route('/stats/promotions', methods=['GET'])
+def get_promotion_summary():
+    try:
+        # Query promotions table to calculate stats
+        promotion_stats = session.query(
+            Promotions.promotion,
+            func.count(Promotions.id).label('total_responses'),
+            func.sum(case((Promotions.responded == 'Yes', 1), else_=0)).label('responded_yes'),
+        ).group_by(Promotions.promotion).order_by(
+            (func.sum(case((Promotions.responded == 'Yes', 1), else_=0)) / func.count(Promotions.id)).desc()
+        ).all()
+
+        # Format the results
+        summary = [
+            {
+                'promotion': promo[0],
+                'total_responses': promo[1],
+                'responded_yes': promo[2],
+                'response_yes_rate': round((promo[2] / promo[1]) * 100, 2) if promo[1] > 0 else 0
+            }
+            for promo in promotion_stats
+        ]
+
+        return jsonify(summary), 200
+
+    except Exception as e:
+        print(f"Error in get_promotion_summary: {str(e)}")  # Debugging
+        return jsonify({"error": str(e)}), 500
+
+

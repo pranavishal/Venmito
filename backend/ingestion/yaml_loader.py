@@ -29,13 +29,13 @@ def yaml_to_dataframe(data):
     return df
 
 if __name__ == "__main__":
-    filepath = Path("../datasets/raw/people.yml")
+    filepath = Path("datasets/raw/people.yml")
 
     # Load and process the YAML data
     people_data = load_yaml_file(filepath)
     people_df = yaml_to_dataframe(people_data)
 
     # Save the processed data to a CSV file
-    output_path = Path("../datasets/processed/people_cleaned_yml.csv")
+    output_path = Path("datasets/processed/people_cleaned_yml.csv")
     people_df.to_csv(output_path, index=False)
     print(f"\nCleaned data saved to: {output_path}")

@@ -40,8 +40,15 @@ export default function PieChart({ title, data, labels, customColors }) {
 
   return (
     <div
-      className="flex justify-center items-center bg-white p-4 rounded-lg shadow"
-      style={{ width: "600px", height: "600px", margin: "0 auto" }}
+      className="flex justify-center items-center bg-white pt-16 pb-16 p-4 rounded-lg shadow"
+      style={{
+        width: "600px",
+        height: "600px",
+        marginTop: "80px",
+        marginBottom: "80px",
+        marginLeft: "auto",
+        marginRight: "auto",
+      }}
     >
       <Pie data={chartData} options={options} />
     </div>

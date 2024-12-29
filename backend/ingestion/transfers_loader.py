@@ -44,12 +44,12 @@ def check_transfers_data(transfers_df, people_df):
         print("\nSome sender_id or recipient_id values are invalid!")
 
 def save_cleaned_transfers(transfers_df):
-    output_path = Path("../datasets/processed/transfers_cleaned.csv")
+    output_path = Path("datasets/processed/transfers_cleaned.csv")
     transfers_df.to_csv(output_path, index=False)
 
 if __name__ == "__main__":
-    transfers_path = Path("../datasets/raw/transfers.csv")
-    people_path = Path("../datasets/processed/people_merged.csv")
+    transfers_path = Path("datasets/raw/transfers.csv")
+    people_path = Path("datasets/processed/people_merged.csv")
 
     # Load the data
     transfers_df = load_transfers(transfers_path)

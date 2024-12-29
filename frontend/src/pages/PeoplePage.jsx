@@ -117,7 +117,7 @@ export default function PeoplePage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">People Page</h1>
+      <h1 className="text-2xl font-bold mb-4">Client Page</h1>
       <div className="grid grid-cols-2 gap-4">
         <input
           type="text"
@@ -224,12 +224,12 @@ export default function PeoplePage() {
       {stats && (
         <div className="flex justify-center items-center gap-8">
           <PieChart
-            title="People by Country"
+            title="Client Distribution by Country"
             data={stats.country_stats.map((stat) => stat.percentage)}
             labels={stats.country_stats.map((stat) => stat.country)}
           />
           <PieChart
-            title="People by Device"
+            title="Client Device Ownership Breakdown"
             data={stats.device_stats.map((stat) => stat.percentage)}
             labels={stats.device_stats.map((stat) => stat.device)}
             customColors={deviceColors}

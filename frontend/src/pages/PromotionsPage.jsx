@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "../components/Table";
 import BarChart from "../components/BarChart";
+import StatTable from "../components/StatTable";
 
 export default function PromotionsPage() {
   const [filters, setFilters] = useState({
@@ -76,6 +77,23 @@ export default function PromotionsPage() {
     };
 
     fetchStats();
+  }, []);
+
+  const [promotionStats, setPromotionStats] = useState([]);
+
+  useEffect(() => {
+    const fetchPromotionStats = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:5000/api/promotions/stats/promotions"
+        );
+        setPromotionStats(response.data);
+      } catch (error) {
+        console.error("Error fetching promotion stats:", error);
+      }
+    };
+
+    fetchPromotionStats();
   }, []);
 
   return (
@@ -159,11 +177,23 @@ export default function PromotionsPage() {
         results
       </div>
 
-      <BarChart
-        title="Response Rate by Country"
-        data={countryStats.map((stat) => stat.response_rate)}
-        labels={countryStats.map((stat) => stat.country)}
-      />
+      <div className="flex flex-col md:flex-row justify-center items-center gap-8">
+        <div className="flex-1 flex justify-center">
+          <BarChart
+            title="Promotion Acceptance Rate by Country"
+            data={countryStats.map((stat) => stat.response_rate)}
+            labels={countryStats.map((stat) => stat.country)}
+          />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <div>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Promotion Item Acceptance Rate (Descending)
+            </h2>
+            <StatTable data={promotionStats} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

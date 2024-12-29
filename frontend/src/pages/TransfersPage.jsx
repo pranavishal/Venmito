@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "../components/Table";
+import PieChart from "../components/PieChart";
+import LineGraph from "../components/LineGraph";
 
 export default function TransfersPage() {
   const [filters, setFilters] = useState({
@@ -47,6 +49,42 @@ export default function TransfersPage() {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const [sentStats, setSentStats] = useState([]);
+  const [receivedStats, setReceivedStats] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:5000/api/transfers/stats/country_transfers"
+        );
+        setSentStats(response.data.sent);
+        setReceivedStats(response.data.received);
+      } catch (error) {
+        console.error("Error fetching country transfer stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const [monthlyTotals, setMonthlyTotals] = useState([]);
+
+  useEffect(() => {
+    const fetchMonthlyTotals = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:5000/api/transfers/stats/monthly_totals"
+        );
+        setMonthlyTotals(response.data);
+      } catch (error) {
+        console.error("Error fetching monthly totals:", error);
+      }
+    };
+
+    fetchMonthlyTotals();
+  }, []);
 
   return (
     <div className="p-4">
@@ -127,6 +165,27 @@ export default function TransfersPage() {
         Showing {indexOfFirstResult + 1} to{" "}
         {Math.min(indexOfLastResult, results.length)} of {results.length}{" "}
         results
+      </div>
+      <div className="flex flex-col gap-8 items-center">
+        <div className="flex flex-row justify-center gap-16">
+          <PieChart
+            title="Distribution of Money Sent by Country"
+            data={sentStats.map((stat) => stat.total_sent)}
+            labels={sentStats.map((stat) => stat.country)}
+          />
+          <PieChart
+            title="Distribution of Money Recieved by Country"
+            data={receivedStats.map((stat) => stat.total_received)}
+            labels={receivedStats.map((stat) => stat.country)}
+          />
+        </div>
+      </div>
+      <div className="mt-8">
+        <LineGraph
+          title="Total Money Sent Per Month"
+          labels={monthlyTotals.map((entry) => entry.month)}
+          data={monthlyTotals.map((entry) => entry.total_sent)}
+        />
       </div>
     </div>
   );
