@@ -63,18 +63,18 @@ The goal is to provide insights about clients, transactions, and promotions by c
 ### Backend Setup
 
 1. Clone the repository:
-   ```bash
+   
    git clone <repository-url>
    cd backend
-   ```
+   
 2. Install Python dependencies (Recommended to use a virtual environment):
-   ```bash
+   
    pip install -r requirements.txt
-   ```
-3. Initialize the backend:
-   ```bash
+   
+3. Initialize/Start the backend:
+   
    python flask_app.py
-   ```
+   
    This will:
    - Run ingestion scripts to process raw datasets.
    - Populate the SQLite database.
@@ -93,18 +93,13 @@ This repository includes a `.env` file that contains the OpenAI API key required
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
-   ```bash
    cd frontend
-   ```
+   
 2. Install dependencies:
-   ```bash
+   
    npm install
-   ```
+   
    This command will automatically install all necessary frontend libraries, such as `chart.js`, `tailwindcss`, and others, as specified in `package.json`.
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
 
 ## Usage Instructions
 
@@ -112,9 +107,9 @@ This repository includes a `.env` file that contains the OpenAI API key required
 
 1. Run the Flask backend:
 
-   ```bash
+   
    python flask_app.py
-   ```
+   
 
    The backend will be available at `http://127.0.0.1:5000`.
 
@@ -132,11 +127,11 @@ This repository includes a `.env` file that contains the OpenAI API key required
 
 ### Frontend
 
-1. Run the React frontend:
+1. Run the React frontend (in a second terminal). cd into Venmito/frontend and run the following command:
 
-   ```bash
+   
    npm run dev
-   ```
+   
 
    The frontend will be available at `http://localhost:5173`.
 
