@@ -65,6 +65,7 @@ The goal is to provide insights about clients, transactions, and promotions by c
 1. Clone the repository:
    
    git clone <repository-url>
+   
    cd backend
    
 2. Install Python dependencies (Recommended to use a virtual environment):
