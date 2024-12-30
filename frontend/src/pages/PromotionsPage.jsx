@@ -34,7 +34,7 @@ export default function PromotionsPage() {
       }
     }
   };
-
+ // Fetch data on component mount
   useEffect(() => {
     const initializeData = async () => {
       setIsLoading(true);

@@ -8,7 +8,7 @@ export default function Navbar() {
   const isActivePath = (path) => {
     return location.pathname === path;
   };
-
+  // Navigation links
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/people", label: "People" },
@@ -17,7 +17,7 @@ export default function Navbar() {
     { path: "/transfers", label: "Transfers" },
     { path: "/insights", label: "Insights" },
   ];
-
+  // Navbar component with responsive design
   return (
     <nav className="bg-gray-800 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +47,6 @@ export default function Navbar() {
               ))}
             </div>
           </div>
-
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button

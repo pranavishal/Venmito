@@ -7,6 +7,7 @@ import TransactionsPage from "./pages/TransactionsPage";
 import TransfersPage from "./pages/TransfersPage";
 import InsightsPage from "./pages/InsightsPage";
 
+// App component to load all the routes
 export default function App() {
   return (
     <Router>

@@ -19,6 +19,7 @@ ChartJS.register(
   Legend
 );
 
+// LineGraph component to render a line graph
 export default function LineGraph({ title, data, labels }) {
   const chartData = {
     labels: labels, // X-axis labels (months)

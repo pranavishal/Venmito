@@ -3,6 +3,7 @@ import axios from "axios";
 import Table from "../components/Table";
 import PieChart from "../components/PieChart";
 
+// PeoplePage component to display people data
 export default function PeoplePage() {
  const [filters, setFilters] = useState({
    first_name: "",
@@ -23,6 +24,7 @@ export default function PeoplePage() {
  const currentResults = results.slice(indexOfFirstResult, indexOfLastResult);
  const totalPages = Math.ceil(results.length / resultsPerPage);
 
+ // Fetch data with retries
  const fetchWithRetry = async (url, maxRetries = 5, delay = 1000) => {
    for (let i = 0; i < maxRetries; i++) {
      try {
@@ -35,6 +37,7 @@ export default function PeoplePage() {
    }
  };
 
+ // Fetch data on component mount
  useEffect(() => {
    const initializeData = async () => {
      setIsLoading(true);
@@ -70,7 +73,7 @@ export default function PeoplePage() {
        : prev.device.filter((d) => d !== value),
    }));
  };
-
+// Fetch filtered results
  const fetchResults = async () => {
    try {
      const response = await axios.get(
