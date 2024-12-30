@@ -19,6 +19,8 @@ The goal is to provide insights about clients, transactions, and promotions by c
 
    - Processes raw datasets in multiple formats (JSON, YAML, CSV, XML) using Python and Pandas.
    - Cleans and normalizes data, saving processed outputs to CSV files.
+   - Please note: The ingestion files rely on relative paths from the root directory because they are invoked by flask_app.py. If the files in backend/data/processed and the venmito.db file in backend/storage are removed, they will be automatically regenerated when the backend server (flask_app.py) is run. To test the ingestion files individually, their relative paths must be adjusted accordingly.
+
 
 2. **Database Integration**:
 
@@ -139,6 +141,9 @@ This repository includes a `.env` file that contains the OpenAI API key required
    The frontend will be available at `http://localhost:5173`.
 
 2. Navigate between pages using the navbar to explore features like filtering, promotions, transactions, and insights.
+
+### PLEASE NOTE
+When navigating to a page, it may take a few moments for the data to load. If the page appears empty initially, it should populate after a short delay. This is particularly true for the Insights page, which interacts with OpenAI's API. While data is being fetched, a "loading insights" message will be displayed. Please allow a few moments for this process to complete.
 
 ## Project Structure
 

@@ -119,5 +119,6 @@ The app will be available at `http://localhost:5173`.
 ---
 
 ## Future Improvements
+- Incorporate responsive design into the frontend.
 - Optimize API calls for faster data fetching and caching.
 - Add unit tests for components and pages to ensure robustness.
