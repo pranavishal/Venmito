@@ -1,11 +1,13 @@
 import pandas as pd
 from pathlib import Path
 
+# Load the promotions data
 def load_promotions(filepath):
     df = pd.read_csv(filepath, na_values=[""])
     df.rename(columns={'telephone': 'phone'}, inplace=True)
     return df
 
+# Check for missing or invalid values
 def check_missing_and_invalid_values(df):
     print("\nMissing or NaN Values by Column:")
     print(df.isnull().sum())
@@ -14,6 +16,7 @@ def check_missing_and_invalid_values(df):
     print("\nUnique Values in 'responded':")
     print(df['responded'].unique())
 
+# Clean the promotions data
 def clean_promotions_data(promotions_df, people_df):
     promotions_df["client_email"] = promotions_df["client_email"].combine_first(promotions_df["phone"].map(people_df.set_index("phone")["email"]))
     promotions_df["phone"] = promotions_df["phone"].combine_first(promotions_df["client_email"].map(people_df.set_index("email")["phone"]))
@@ -24,10 +27,12 @@ def clean_promotions_data(promotions_df, people_df):
 
     return promotions_df
 
+# Save the cleaned promotions data
 def save_cleaned_promotions(promotions_df):
     output_path = Path("datasets/processed/promotions_cleaned.csv")
     promotions_df.to_csv(output_path, index=False)
 
+# Main function to run the script
 if __name__ == "__main__":
     filepath = Path("datasets/raw/promotions.csv")
     promotions_df = load_promotions(filepath)

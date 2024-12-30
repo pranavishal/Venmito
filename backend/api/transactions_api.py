@@ -15,6 +15,7 @@ session = Session()
 # Define the blueprint
 transactions_blueprint = Blueprint('transactions', __name__)
 
+# Endpoint to display all transactions and perform filtering
 @transactions_blueprint.route('/filter', methods=['GET'])
 def filter_transactions():
     try:
@@ -71,6 +72,7 @@ def filter_transactions():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Endpoint to get transaction statistics by customer
 @transactions_blueprint.route('/stats/customers', methods=['GET'])
 def get_customer_stats():
     try:
@@ -82,7 +84,7 @@ def get_customer_stats():
         order_by(func.sum(Transactions.total_price).desc()).\
         all()
 
-        # Get the favorite item for each customer
+        # Get the favorite item for each customer (By quantity bought)
         customer_favorite_items = session.query(
             Transactions.customer_id,
             Transactions.item_name,
@@ -95,7 +97,7 @@ def get_customer_stats():
         distinct(Transactions.customer_id).\
         all()
 
-        # Get the favorite store for each customer
+        # Get the favorite store for each customer (By total money spent)
         customer_favorite_stores = session.query(
             Transactions.customer_id,
             Transactions.store,
@@ -145,7 +147,7 @@ def get_store_stats():
         order_by(func.sum(Transactions.total_price).desc()).\
         all()
 
-        # Get the best customer for each store
+        # Get the best customer for each store (by total money spent)
         store_best_customers = session.query(
             Transactions.store,
             Transactions.customer_id,
@@ -155,7 +157,7 @@ def get_store_stats():
         distinct(Transactions.store).\
         all()
 
-        # Get the best selling product for each store
+        # Get the best selling product for each store (by total quantity sold)
         store_best_products = session.query(
             Transactions.store,
             Transactions.item_name,
@@ -193,9 +195,12 @@ def get_store_stats():
         print(f"Error in get_store_stats: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+
+# Endpoint to get spending statistics by country
 @transactions_blueprint.route('/stats/spending_by_country', methods=['GET'])
 def get_spending_by_country():
     try:
+        # Get total spending by country
         spending_stats = session.query(
             func.coalesce(People.country, 'Unknown').label('country'),
             func.sum(func.coalesce(Transactions.total_price, 0)).label('total_spent')

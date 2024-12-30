@@ -7,6 +7,7 @@ import os
 DB_PATH = Path("storage/venmito.db")
 CLEANED_DATA_PATH = Path("datasets/processed/")
 
+# Deletes existing database if it exists
 def delete_existing_database(db_path):
     """Delete the existing database file if it exists"""
     try:
@@ -18,6 +19,7 @@ def delete_existing_database(db_path):
     except Exception as e:
         print(f"Error deleting existing database: {e}")
 
+# Connect to the database
 def connect_to_database(db_path):
     try:
         connection = sqlite3.connect(db_path)
@@ -27,6 +29,7 @@ def connect_to_database(db_path):
         print(f"Error connecting to database: {e}")
         return None
 
+# Create tables in the database
 def create_tables(connection, schema_path):
     try:
         with open(schema_path, "r") as file:
@@ -38,6 +41,7 @@ def create_tables(connection, schema_path):
     except Exception as e:
         print(f"Error creating tables: {e}")
 
+# Load data from CSV file into a table
 def load_data_to_table(connection, table_name, csv_file):
     try:
         df = pd.read_csv(csv_file)
@@ -46,6 +50,7 @@ def load_data_to_table(connection, table_name, csv_file):
     except Exception as e:
         print(f"Error loading data into {table_name}: {e}")
 
+# Main function to setup the database and load data
 if __name__ == "__main__":
     # Delete existing database first
     delete_existing_database(DB_PATH)

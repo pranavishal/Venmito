@@ -2,6 +2,7 @@ import pandas as pd
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+# Load transactions data
 def load_transactions(filepath):
     """
     Parses transactions.xml and flattens the data into a row-per-item structure.
@@ -34,6 +35,7 @@ def load_transactions(filepath):
 
     return pd.DataFrame(rows)
 
+# Map phone numbers to customer IDs
 def map_phone_to_customer_id(transactions_df, people_df):
     """
     Maps phone numbers from transactions to customer IDs in the people dataset.
@@ -46,6 +48,7 @@ def map_phone_to_customer_id(transactions_df, people_df):
 
     return transactions_df
 
+# Save cleaned transactions
 def save_cleaned_transactions(transactions_df):
     """
     Saves the cleaned transactions to a CSV file.
@@ -54,6 +57,7 @@ def save_cleaned_transactions(transactions_df):
     transactions_df.to_csv(output_path, index=False)
     print(f"\nCleaned transactions data saved to: {output_path}")
 
+# Main function to run the script
 if __name__ == "__main__":
     # File paths
     transactions_path = Path("datasets/raw/transactions.xml")

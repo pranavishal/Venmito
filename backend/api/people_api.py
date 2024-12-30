@@ -14,6 +14,7 @@ session = Session()
 # Define the blueprint
 people_blueprint = Blueprint('people', __name__)
 
+# Endpoint to display all people and perform filtering
 @people_blueprint.route('/filter', methods=['GET'])
 def filter_people():
     try:
@@ -81,6 +82,7 @@ def filter_people():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Query stats for people data based on country and device
 @people_blueprint.route('/stats', methods=['GET'])
 def get_stats():
     try:

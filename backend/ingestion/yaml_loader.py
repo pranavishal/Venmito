@@ -2,12 +2,15 @@ import yaml
 from pathlib import Path
 import pandas as pd
 
+# Load the YAML file into a list of dictionaries
 def load_yaml_file(filepath):
     with open(filepath, "r") as file:
         # Load the YAML file directly into a list
         data = yaml.safe_load(file)
-    return data  # Return the list of dictionaries directly
+    # Return the list of dictionaries directly
+    return data  
 
+# Convert the list of dictionaries to a DataFrame
 def yaml_to_dataframe(data):
     # Convert the list of dictionaries to a DataFrame
     df = pd.DataFrame(data)
@@ -28,6 +31,7 @@ def yaml_to_dataframe(data):
 
     return df
 
+# Main function to run the script
 if __name__ == "__main__":
     filepath = Path("datasets/raw/people.yml")
 

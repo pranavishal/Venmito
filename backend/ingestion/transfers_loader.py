@@ -1,31 +1,13 @@
 import pandas as pd
 from pathlib import Path
 
+# Load the transfers data
 def load_transfers(filepath):
-    """
-    Loads the transfers CSV file into a Pandas DataFrame.
-
-    Args:
-        filepath (str or Path): Path to the transfers CSV file.
-
-    Returns:
-        pd.DataFrame: The loaded DataFrame.
-    """
     df = pd.read_csv(filepath)
     return df
 
+# Check the transfers data
 def check_transfers_data(transfers_df, people_df):
-    """
-    Checks the transfers DataFrame for missing values, valid data types,
-    and referential integrity with the people DataFrame.
-
-    Args:
-        transfers_df (pd.DataFrame): The transfers DataFrame.
-        people_df (pd.DataFrame): The people DataFrame.
-
-    Returns:
-        None
-    """
     # Check for missing values
     print("\nMissing or NaN Values by Column:")
     print(transfers_df.isnull().sum())
@@ -43,10 +25,12 @@ def check_transfers_data(transfers_df, people_df):
     else:
         print("\nSome sender_id or recipient_id values are invalid!")
 
+# Save the cleaned transfers data
 def save_cleaned_transfers(transfers_df):
     output_path = Path("datasets/processed/transfers_cleaned.csv")
     transfers_df.to_csv(output_path, index=False)
 
+# Main function to run the script
 if __name__ == "__main__":
     transfers_path = Path("datasets/raw/transfers.csv")
     people_path = Path("datasets/processed/people_merged.csv")

@@ -15,6 +15,7 @@ session = Session()
 # Define the blueprint
 promotions_blueprint = Blueprint('promotions', __name__)
 
+# Endpoint to display all promotions and perform filtering
 @promotions_blueprint.route('/filter', methods=['GET'])
 def filter_promotions():
     try:
@@ -63,6 +64,7 @@ def filter_promotions():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Endpoint to get promotion acceptance statistics by country
 @promotions_blueprint.route('/stats', methods=['GET'])
 def get_promotion_stats():
     try:
@@ -123,6 +125,7 @@ def get_promotion_stats():
         print(f"Error in get_promotion_stats: {str(e)}")  # For debugging
         return jsonify({"error": str(e)}), 500
 
+# Endpoint to get promotion summary statistics by promotion item
 @promotions_blueprint.route('/stats/promotions', methods=['GET'])
 def get_promotion_summary():
     try:

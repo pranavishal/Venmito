@@ -128,6 +128,6 @@ Here is a quick reference for the available API endpoints:
 
 ## Future Improvements
 
-- Add Docker support for easier deployment.
+- Have a dedicated rule breaker for ties when having tables are displayed with an ordering property
 - Integrate a more robust database solution (e.g., PostgreSQL).
 - Make paths absolute so ingestion scripts can be run individually from `backend/ingestion/`.

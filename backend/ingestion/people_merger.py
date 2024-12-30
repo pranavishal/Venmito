@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
+# Load the processed JSON and YAML files
 def load_people_files():
 
     json_path = Path("datasets/processed/people_cleaned_json.csv")
@@ -19,6 +20,7 @@ def load_people_files():
 
     return json_df, yml_df
 
+# Merge the JSON and YAML data
 def merge_people_data(json_df, yml_df):
     merged_df = pd.merge(json_df, yml_df, on='id', how="outer", suffixes=("_json", "_yml"))
     # Resolve conflicts for shared columns
@@ -49,10 +51,12 @@ def merge_people_data(json_df, yml_df):
 
     return merged_df
 
+# Save the merged data to a CSV file
 def save_merged_people(merged_df):
     output_path = Path("datasets/processed/people_merged.csv")
     merged_df.to_csv(output_path, index=False)
 
+# Main function to run the script
 if __name__ == "__main__":
     json_df, yml_df = load_people_files()
     merged_people_df = merge_people_data(json_df, yml_df)

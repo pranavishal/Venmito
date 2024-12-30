@@ -16,6 +16,7 @@ session = Session()
 # Define the blueprint
 transfers_blueprint = Blueprint('transfers', __name__)
 
+# Endpoint to display all transfers and perform filtering
 @transfers_blueprint.route('/filter', methods=['GET'])
 def filter_transfers():
     try:
@@ -76,6 +77,7 @@ def filter_transfers():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Endpoint to get transfer distribution by country and total money sent/received distribution
 @transfers_blueprint.route('/stats/country_transfers', methods=['GET'])
 def get_country_transfer_stats():
     try:
@@ -112,6 +114,7 @@ def get_country_transfer_stats():
         print(f"Error in get_country_transfer_stats: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+# Endpoint to get monthly total money sent by month
 @transfers_blueprint.route('/stats/monthly_totals', methods=['GET'])
 def get_monthly_totals():
     try:

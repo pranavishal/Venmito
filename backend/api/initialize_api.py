@@ -7,10 +7,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Initialize the OpenAI API client
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 initialize_blueprint = Blueprint('initialize', __name__)
 
-@initialize_blueprint.route('/customers', methods=['POST'])  # Changed from /analyze/customers
+# OpenAI API endpoint for generating insights on customer data from results in people and transaction pages
+@initialize_blueprint.route('/customers', methods=['POST'])  
 def analyze_customers():
     try:
         # Fetch only customer-relevant data
@@ -18,6 +20,7 @@ def analyze_customers():
         people_stats = requests.get("http://127.0.0.1:5000/api/people/stats").json()
         transactions_customers = requests.get("http://127.0.0.1:5000/api/transactions/stats/customers").json()
         
+        # Prepare data for the GPT-4 model
         data = {
             "people": people,
             "stats": {
@@ -29,6 +32,7 @@ def analyze_customers():
             }
         }
 
+        # Generate insights using the GPT-4 model
         prompt = f"""
         You are analyzing customer data for Venmito, a payment company. Based on the provided data, generate insights about:
         
@@ -56,6 +60,7 @@ def analyze_customers():
     except Exception as e:
         return jsonify({"error": "Error analyzing customer data", "details": str(e)}), 500
 
+# OpenAI API endpoint for generating insights on promotion data from results in promotions page
 @initialize_blueprint.route('/promotions', methods=['POST'])  # Changed from /analyze/promotions
 def analyze_promotions():
     try:
@@ -101,6 +106,7 @@ def analyze_promotions():
     except Exception as e:
         return jsonify({"error": "Error analyzing promotions data", "details": str(e)}), 500
 
+# OpenAI API endpoint for generating insights on transaction data from results in transactions page
 @initialize_blueprint.route('/transactions', methods=['POST'])  # Changed from /analyze/transactions
 def analyze_transactions():
     try:
@@ -148,6 +154,7 @@ def analyze_transactions():
     except Exception as e:
         return jsonify({"error": "Error analyzing transactions data", "details": str(e)}), 500
 
+# OpenAI API endpoint for generating insights on transfer data from results in transfers page
 @initialize_blueprint.route('/transfers', methods=['POST'])  # Changed from /analyze/transfers
 def analyze_transfers():
     try:
