@@ -119,8 +119,5 @@ The app will be available at `http://localhost:5173`.
 ---
 
 ## Future Improvements
-
-- Add additional visualizations, such as heatmaps or stacked bar charts.
-- Implement user authentication and role-based access control.
 - Optimize API calls for faster data fetching and caching.
 - Add unit tests for components and pages to ensure robustness.
