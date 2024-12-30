@@ -2,7 +2,7 @@
 
 ## Overview
 
-Venmito is a full-stack data engineering project designed to clean, process, and analyze data from various formats into a structured SQLite database. The project includes a Flask backend for data processing and API handling, and a Vite/React frontend for user interaction and visualization.
+Venmito is a full-stack data engineering project designed to clean, process, and analyze data from various formats into a structured SQLite database. The project includes a Flask backend for data processing and API handling, and a Vite/React frontend for user interaction and visualization. There is comprehensive documentation in the Documentation folder for both the front-end and back-end.
 
 The project follows a systematic approach:
 
@@ -19,7 +19,7 @@ The goal is to provide insights about clients, transactions, and promotions by c
 
    - Processes raw datasets in multiple formats (JSON, YAML, CSV, XML) using Python and Pandas.
    - Cleans and normalizes data, saving processed outputs to CSV files.
-   - Please note: The ingestion files rely on relative paths from the root directory because they are invoked by flask_app.py. If the files in backend/data/processed (but not the processed folder itself!) and the venmito.db file in backend/storage are removed, they will be automatically regenerated when the backend server (flask_app.py) is run. To test the ingestion files individually, their relative paths must be adjusted accordingly within their respective scripts
+   - Please note: The ingestion files rely on relative paths from the root directory because they are invoked by flask_app.py. By default, the processed files and the final database is given. However, if the processed csv files in backend/data/processed (but not the processed folder itself!) and the venmito.db file in backend/storage are removed, they will be automatically regenerated when the backend server (flask_app.py) is run. To test the ingestion files individually, their relative paths must be adjusted accordingly within their respective scripts.
 
 
 2. **Database Integration**:
