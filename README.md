@@ -19,7 +19,7 @@ The goal is to provide insights about clients, transactions, and promotions by c
 
    - Processes raw datasets in multiple formats (JSON, YAML, CSV, XML) using Python and Pandas.
    - Cleans and normalizes data, saving processed outputs to CSV files.
-   - Please note: The ingestion files rely on relative paths from the root directory because they are invoked by flask_app.py. If the files in backend/data/processed and the venmito.db file in backend/storage are removed, they will be automatically regenerated when the backend server (flask_app.py) is run. To test the ingestion files individually, their relative paths must be adjusted accordingly.
+   - Please note: The ingestion files rely on relative paths from the root directory because they are invoked by flask_app.py. If the files in backend/data/processed (but not the processed folder itself!) and the venmito.db file in backend/storage are removed, they will be automatically regenerated when the backend server (flask_app.py) is run. To test the ingestion files individually, their relative paths must be adjusted accordingly within their respective scripts
 
 
 2. **Database Integration**:
@@ -67,7 +67,7 @@ The goal is to provide insights about clients, transactions, and promotions by c
    git clone <repository-url>
    cd backend
    ```
-2. Install Python dependencies:
+2. Install Python dependencies (Recommended to use a virtual environment):
    ```bash
    pip install -r requirements.txt
    ```
@@ -187,10 +187,8 @@ When navigating to a page, it may take a few moments for the data to load. If th
 
 ## Future Improvements
 
-- Add Docker support for easier deployment.
-- Expand frontend visualizations with dynamic charts.
-- Implement user authentication for enhanced security.
-- Optimize database queries for scalability.
+- Improve AI Insights through fine-tuning or an RAG Architecture
+- Make front end responsive
 
 ---
 
