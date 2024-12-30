@@ -14,6 +14,9 @@ backend/
 ├── ingestion/        # Scripts for cleaning and transforming raw datasets
 ├── models/           # Python models representing database schema (SQLAlchemy ORM)
 ├── storage/          # SQLite database and database loader
+├── datasets/         # Data storage folder
+│   ├── raw/          # Raw datasets used as input for ingestion
+│   └── processed/    # Processed datasets outputted by ingestion
 ├── flask_app.py      # Main entry point for backend
 ├── .env              # Contains OpenAI API key
 └── requirements.txt  # Python dependencies
@@ -24,7 +27,7 @@ backend/
 ## Core Functionalities
 
 ### 1. **Data Ingestion**
-The `ingestion/` folder contains scripts for processing raw datasets into cleaned CSVs:
+The `ingestion/` folder contains scripts for processing raw datasets into cleaned CSVs. The raw data files are located in the `datasets/raw/` folder, and the cleaned CSVs are saved in the `datasets/processed/` folder:
 - **`json_loader.py`**: Cleans and converts JSON files into CSV format.
 - **`yaml_loader.py`**: Similar to `json_loader.py` but processes YAML files.
 - **`people_merger.py`**: Merges cleaned JSON and YAML files into a consolidated `people.csv`.
