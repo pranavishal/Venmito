@@ -74,24 +74,59 @@ def filter_transactions():
 @transactions_blueprint.route('/stats/customers', methods=['GET'])
 def get_customer_stats():
     try:
-        customer_stats = session.query(
+        # Get the total spending for each customer
+        customer_spending = session.query(
             Transactions.customer_id,
-            func.sum(Transactions.total_price).label('total_spent'),
-            func.max(Transactions.item_name).label('favorite_item'),
-            func.max(Transactions.store).label('favorite_store')
-        ).group_by(Transactions.customer_id).order_by(
-            func.sum(Transactions.total_price).desc()
-        ).all()
+            func.sum(Transactions.total_price).label('total_spent')
+        ).group_by(Transactions.customer_id).\
+        order_by(func.sum(Transactions.total_price).desc()).\
+        all()
 
-        results = [
-            {
-                'customer_id': stat[0],
-                'total_spent': stat[1],
-                'favorite_item': stat[2],
-                'favorite_store': stat[3],
-            }
-            for stat in customer_stats
-        ]
+        # Get the favorite item for each customer
+        customer_favorite_items = session.query(
+            Transactions.customer_id,
+            Transactions.item_name,
+            func.sum(Transactions.quantity).label('total_quantity')
+        ).group_by(
+            Transactions.customer_id,
+            Transactions.item_name
+        ).\
+        order_by(Transactions.customer_id, func.sum(Transactions.quantity).desc()).\
+        distinct(Transactions.customer_id).\
+        all()
+
+        # Get the favorite store for each customer
+        customer_favorite_stores = session.query(
+            Transactions.customer_id,
+            Transactions.store,
+            func.sum(Transactions.total_price).label('total_spent')
+        ).group_by(
+            Transactions.customer_id,
+            Transactions.store
+        ).\
+        order_by(Transactions.customer_id, func.sum(Transactions.total_price).desc()).\
+        distinct(Transactions.customer_id, Transactions.store).\
+        all()
+
+        # Combine the results
+        results = []
+        for customer_id, total_spent in customer_spending:
+            favorite_item_row = next((row for row in customer_favorite_items if row.customer_id == customer_id), None)
+            favorite_store_row = next((row for row in customer_favorite_stores if row.customer_id == customer_id), None)
+            if favorite_item_row:
+                favorite_item = favorite_item_row.item_name
+            else:
+                favorite_item = None
+            if favorite_store_row:
+                favorite_store = favorite_store_row.store
+            else:
+                favorite_store = None
+            results.append({
+                'customer_id': customer_id,
+                'total_spent': total_spent,
+                'favorite_item': favorite_item,
+                'favorite_store': favorite_store
+            })
 
         return jsonify(results), 200
 
@@ -102,27 +137,57 @@ def get_customer_stats():
 @transactions_blueprint.route('/stats/stores', methods=['GET'])
 def get_store_stats():
     try:
-        store_stats = session.query(
+        # Get the total spending for each store
+        store_total_spending = session.query(
             Transactions.store,
-            func.max(Transactions.customer_id).label('best_customer'),
-            func.max(People.country).label('best_country'),
-            func.sum(Transactions.total_price).label('total_money_made'),
-            func.max(Transactions.item_name).label('best_selling_product')
-        ).join(People, Transactions.customer_id == People.id).group_by(Transactions.store).order_by(
-            func.sum(Transactions.total_price).desc()
-        ).all()
+            func.sum(Transactions.total_price).label('total_money_made')
+        ).group_by(Transactions.store).\
+        order_by(func.sum(Transactions.total_price).desc()).\
+        all()
 
-        results = [
-            {
-                'store': stat[0],
-                'best_customer': stat[1],
-                'total_money_made': stat[3],
-                'best_selling_product': stat[4],
-            }
-            for stat in store_stats
-        ]
+        # Get the best customer for each store
+        store_best_customers = session.query(
+            Transactions.store,
+            Transactions.customer_id,
+            func.sum(Transactions.total_price).label('customer_total_spent')
+        ).group_by(Transactions.store, Transactions.customer_id).\
+        order_by(Transactions.store, func.sum(Transactions.total_price).desc()).\
+        distinct(Transactions.store).\
+        all()
 
-        return jsonify(results), 200
+        # Get the best selling product for each store
+        store_best_products = session.query(
+            Transactions.store,
+            Transactions.item_name,
+            func.sum(Transactions.quantity).label('total_quantity')
+        ).group_by(Transactions.store, Transactions.item_name).\
+        order_by(Transactions.store, func.sum(Transactions.quantity).desc()).\
+        distinct(Transactions.store).\
+        all()
+
+        # Combine the results
+        results = []
+        for store_row in store_total_spending:
+            store = store_row.store
+            total_money_made = store_row.total_money_made
+            best_customer_row = next((row for row in store_best_customers if row.store == store), None)
+            if best_customer_row:
+                best_customer = best_customer_row.customer_id
+            else:
+                best_customer = None
+            best_product_row = next((row for row in store_best_products if row.store == store), None)
+            if best_product_row:
+                best_selling_product = best_product_row.item_name
+            else:
+                best_selling_product = None
+            results.append({
+                'store': store,
+                'best_customer': best_customer,
+                'best_selling_product': best_selling_product, 
+                'total_money_made': total_money_made
+            })
+
+        return jsonify(sorted(results, key=lambda x: x['total_money_made'], reverse=True)), 200
 
     except Exception as e:
         print(f"Error in get_store_stats: {str(e)}")

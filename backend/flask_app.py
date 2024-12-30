@@ -19,9 +19,6 @@ app = Flask(__name__)
 # Get the absolute path to your project directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# Create insights directory inside static folder
-INSIGHTS_DIR = os.path.join(BASE_DIR, "static", "insights")
-os.makedirs(INSIGHTS_DIR, exist_ok=True)
 
 # Enable CORS
 CORS(app, resources={
@@ -88,21 +85,6 @@ app.register_blueprint(promotions_blueprint, url_prefix="/api/promotions")
 app.register_blueprint(transactions_blueprint, url_prefix="/api/transactions")
 app.register_blueprint(transfers_blueprint, url_prefix="/api/transfers")
 app.register_blueprint(initialize_blueprint, url_prefix="/api/initialize")
-
-# Route to get stored insights
-@app.route('/api/insights/<category>', methods=['GET'])
-def get_insights(category):
-    try:
-        filepath = os.path.join(INSIGHTS_DIR, f"{category}_insights.json")
-        if not os.path.exists(filepath):
-            print(f"File not found: {filepath}")
-            return jsonify({"error": f"No insights found for {category}"}), 404
-            
-        with open(filepath, 'r') as f:
-            return jsonify(json.load(f))
-    except Exception as e:
-        print(f"Error reading insights: {str(e)}")
-        return jsonify({"error": f"Error reading insights for {category}"}), 500
 
 # Main entry point
 if __name__ == "__main__":
