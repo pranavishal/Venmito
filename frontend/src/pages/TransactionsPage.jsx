@@ -14,6 +14,10 @@ export default function TransactionsPage() {
   const [results, setResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [resultsPerPage] = useState(10);
+  const [customerStats, setCustomerStats] = useState([]);
+  const [storeStats, setStoreStats] = useState([]);
+  const [spendingByCountry, setSpendingByCountry] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Get current results
   const indexOfLastResult = currentPage * resultsPerPage;
@@ -21,9 +25,41 @@ export default function TransactionsPage() {
   const currentResults = results.slice(indexOfFirstResult, indexOfLastResult);
   const totalPages = Math.ceil(results.length / resultsPerPage);
 
+  const fetchWithRetry = async (url, maxRetries = 5, delay = 1000) => {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const response = await axios.get(url);
+        return response.data;
+      } catch (error) {
+        if (i === maxRetries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  };
+
   useEffect(() => {
-    // When component mounts, fetch all results
-    fetchResults();
+    const initializeData = async () => {
+      setIsLoading(true);
+      try {
+        const [resultsResponse, customerResponse, storeResponse, countryResponse] = await Promise.all([
+          fetchWithRetry("http://127.0.0.1:5000/api/transactions/filter"),
+          fetchWithRetry("http://127.0.0.1:5000/api/transactions/stats/customers"),
+          fetchWithRetry("http://127.0.0.1:5000/api/transactions/stats/stores"),
+          fetchWithRetry("http://127.0.0.1:5000/api/transactions/stats/spending_by_country")
+        ]);
+        
+        setResults(resultsResponse);
+        setCustomerStats(customerResponse);
+        setStoreStats(storeResponse);
+        setSpendingByCountry(countryResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeData();
   }, []);
 
   const handleInputChange = (e) => {
@@ -40,7 +76,7 @@ export default function TransactionsPage() {
         }
       );
       setResults(response.data);
-      setCurrentPage(1); // Reset to page 1 whenever new results are fetched
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -49,35 +85,6 @@ export default function TransactionsPage() {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
-  const [customerStats, setCustomerStats] = useState([]);
-  const [storeStats, setStoreStats] = useState([]);
-  const [spendingByCountry, setSpendingByCountry] = useState([]);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const customerResponse = await axios.get(
-          "http://127.0.0.1:5000/api/transactions/stats/customers"
-        );
-        setCustomerStats(customerResponse.data);
-
-        const storeResponse = await axios.get(
-          "http://127.0.0.1:5000/api/transactions/stats/stores"
-        );
-        setStoreStats(storeResponse.data);
-
-        const countryResponse = await axios.get(
-          "http://127.0.0.1:5000/api/transactions/stats/spending_by_country"
-        );
-        setSpendingByCountry(countryResponse.data);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
 
   return (
     <div className="p-4">
@@ -154,34 +161,39 @@ export default function TransactionsPage() {
         results
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-        <div className="flex-1 flex justify-center">
-          <div>
-            <h2 className="text-xl font-bold mb-4 text-center">
-              Customer Spending (Greatest to Least)
-            </h2>
-            <StatTable data={customerStats} />
+      {/* Charts and Stats section */}
+      {!isLoading && customerStats.length > 0 && storeStats.length > 0 && (
+        <>
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+            <div className="flex-1 flex justify-center">
+              <div>
+                <h2 className="text-xl font-bold mb-4 text-center">
+                  Customer Spending (Greatest to Least)
+                </h2>
+                <StatTable data={customerStats} />
+              </div>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <div>
+                <h2 className="text-xl font-bold mb-4 text-center">
+                  Store Revenue (Greatest to Least)
+                </h2>
+                <StatTable data={storeStats} />
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="flex-1 flex justify-center">
-          <div>
-            <h2 className="text-xl font-bold mb-4 text-center">
-              Store Revenue (Greatest to Least)
-            </h2>
-            <StatTable data={storeStats} />
+          <div className="flex justify-center mt-8">
+            <div>
+              <h2 className="text-xl font-bold mb-4 text-center"></h2>
+              <PieChart
+                title="Transactions Spent by Country"
+                data={spendingByCountry.map((stat) => stat.total_spent)}
+                labels={spendingByCountry.map((stat) => stat.country)}
+              />
+            </div>
           </div>
-        </div>
-      </div>
-      <div className="flex justify-center mt-8">
-        <div>
-          <h2 className="text-xl font-bold mb-4 text-center"></h2>
-          <PieChart
-            title="Transactions Spent by Country"
-            data={spendingByCountry.map((stat) => stat.total_spent)}
-            labels={spendingByCountry.map((stat) => stat.country)}
-          />
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

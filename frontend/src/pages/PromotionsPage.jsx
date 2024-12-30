@@ -13,6 +13,9 @@ export default function PromotionsPage() {
   const [results, setResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [resultsPerPage] = useState(10);
+  const [countryStats, setCountryStats] = useState([]);
+  const [promotionStats, setPromotionStats] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Get current results
   const indexOfLastResult = currentPage * resultsPerPage;
@@ -20,9 +23,39 @@ export default function PromotionsPage() {
   const currentResults = results.slice(indexOfFirstResult, indexOfLastResult);
   const totalPages = Math.ceil(results.length / resultsPerPage);
 
+  const fetchWithRetry = async (url, maxRetries = 5, delay = 1000) => {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const response = await axios.get(url);
+        return response.data;
+      } catch (error) {
+        if (i === maxRetries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  };
+
   useEffect(() => {
-    // When component mounts, fetch all results
-    fetchResults();
+    const initializeData = async () => {
+      setIsLoading(true);
+      try {
+        const [resultsResponse, statsResponse, promotionsResponse] = await Promise.all([
+          fetchWithRetry("http://127.0.0.1:5000/api/promotions/filter"),
+          fetchWithRetry("http://127.0.0.1:5000/api/promotions/stats"),
+          fetchWithRetry("http://127.0.0.1:5000/api/promotions/stats/promotions")
+        ]);
+        
+        setResults(resultsResponse);
+        setCountryStats(statsResponse.country_stats);
+        setPromotionStats(promotionsResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeData();
   }, []);
 
   const handleInputChange = (e) => {
@@ -52,7 +85,7 @@ export default function PromotionsPage() {
         }
       );
       setResults(response.data);
-      setCurrentPage(1); // Reset to page 1 whenever new results are fetched
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -61,40 +94,6 @@ export default function PromotionsPage() {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
-  const [countryStats, setCountryStats] = useState([]);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:5000/api/promotions/stats"
-        );
-        setCountryStats(response.data.country_stats);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-  const [promotionStats, setPromotionStats] = useState([]);
-
-  useEffect(() => {
-    const fetchPromotionStats = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:5000/api/promotions/stats/promotions"
-        );
-        setPromotionStats(response.data);
-      } catch (error) {
-        console.error("Error fetching promotion stats:", error);
-      }
-    };
-
-    fetchPromotionStats();
-  }, []);
 
   return (
     <div className="p-4">
@@ -177,23 +176,26 @@ export default function PromotionsPage() {
         results
       </div>
 
-      <div className="flex flex-col md:flex-row justify-center items-center gap-8">
-        <div className="flex-1 flex justify-center">
-          <BarChart
-            title="Promotion Acceptance Rate by Country"
-            data={countryStats.map((stat) => stat.response_rate)}
-            labels={countryStats.map((stat) => stat.country)}
-          />
-        </div>
-        <div className="flex-1 flex justify-center">
-          <div>
-            <h2 className="text-xl font-bold mb-4 text-center">
-              Promotion Item Acceptance Rate (Descending)
-            </h2>
-            <StatTable data={promotionStats} />
+      {/* Charts section */}
+      {!isLoading && countryStats.length > 0 && promotionStats.length > 0 && (
+        <div className="flex flex-col md:flex-row justify-center items-center gap-8">
+          <div className="flex-1 flex justify-center">
+            <BarChart
+              title="Promotion Acceptance Rate by Country"
+              data={countryStats.map((stat) => stat.response_rate)}
+              labels={countryStats.map((stat) => stat.country)}
+            />
+          </div>
+          <div className="flex-1 flex justify-center">
+            <div>
+              <h2 className="text-xl font-bold mb-4 text-center">
+                Promotion Item Acceptance Rate (Descending)
+              </h2>
+              <StatTable data={promotionStats} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
