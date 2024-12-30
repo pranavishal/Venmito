@@ -106,7 +106,7 @@ This repository includes a .env file that contains the OpenAI API key required f
 1. Open the .env file located in the backend directory.
 2. Replace the existing key with your own OpenAI API key:
    
-env
+
    OPENAI_API_KEY=your_openai_api_key_here
 
 3. Save the file and restart the backend server to apply the changes.
