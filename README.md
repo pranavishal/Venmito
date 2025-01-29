@@ -101,12 +101,11 @@ The goal is to provide insights about clients, transactions, and promotions by c
 
 ### Environment Configuration
 
-This repository includes a `.env` file that contains an OpenAI API key required for accessing the LLM insights functionality. While including a `.env` file in a repository is generally not considered best practice, this project is hosted in a private repository and shared exclusively for evaluation purposes.
+This repository includes a `.env` file that contains an OpenAI API key required for accessing the LLM insights functionality.
 
-**A preconfigured OpenAI API key is already provided, so using your own key is optional.** However, if you prefer to use a custom OpenAI API key, you can do so by following these steps:
 
 1. Navigate to the `.env` file located in the `backend` directory.
-2. Replace the existing API key with your own OpenAI API key:
+2. Insert API key with your own OpenAI API key:
    ```plaintext
    OPENAI_API_KEY=your_openai_api_key_here
 3. Save the file and restart the backend server to apply the changes.
